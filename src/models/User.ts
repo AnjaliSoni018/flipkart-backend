@@ -1,0 +1,94 @@
+import { DataTypes, Model, Optional } from "sequelize";
+import sequelize from "../config/config";
+
+interface UserAttributes {
+  id: number;
+  name?: string | null;
+  phone: string;
+  email?: string | null;
+  password?: string | null;
+  role: "CUSTOMER" | "SELLER" | "ADMIN";
+  isVerified: boolean;
+  isApproved: boolean;
+  gstin?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+type UserCreationAttributes = Optional<
+  UserAttributes,
+  "id" | "name" | "email" | "password" | "gstin" | "isVerified" | "isApproved"
+>;
+
+class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes
+{
+  public id!: number;
+  public name!: string | null;
+  public phone!: string;
+  public email!: string | null;
+  public password!: string | null;
+  public role!: "CUSTOMER" | "SELLER" | "ADMIN";
+  public isVerified!: boolean;
+  public isApproved!: boolean;
+  public gstin!: string | null;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+      validate: { isEmail: true },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    role: {
+      type: DataTypes.ENUM("CUSTOMER", "SELLER", "ADMIN"),
+      allowNull: false,
+      defaultValue: "CUSTOMER",
+    },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    isApproved: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    gstin: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  },
+  {
+    sequelize,
+    tableName: "users",
+    timestamps: true,
+  }
+);
+
+export default User;
