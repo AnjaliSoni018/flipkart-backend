@@ -1,7 +1,8 @@
-import { User } from "../../../models";
-import { generateOTP, setOTP, validateOTP } from "./auth.utils";
+// import  User from "../../../models/User";
 import jwt from "jsonwebtoken";
-
+import db from "../../../models";
+import { generateOTP, setOTP, validateOTP } from "./auth.utils";
+const { User } = db;
 export const authService = {
   async authWithOTP(phone: string) {
     try {

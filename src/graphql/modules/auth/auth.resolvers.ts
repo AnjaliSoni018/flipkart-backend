@@ -1,6 +1,9 @@
 import { authService } from "./auth.service";
 
 export const authResolvers = {
+  Query: {
+    _empty: () => "API running 🚀",
+  },
   Mutation: {
     authWithOTP: async (_: unknown, { phone }: { phone: string }) => {
       return await authService.authWithOTP(phone);

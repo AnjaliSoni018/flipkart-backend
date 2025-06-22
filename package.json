@@ -53,9 +53,6 @@
     "sequelize": "^6.37.7"
   },
   "sequelize": {
-    "config": "src/config/sequelize.ts",
-    "models-path": "src/models",
-    "seeders-path": "src/seeders",
-    "migrations-path": "src/migrations"
-  }
+  "config": "src/config/sequelize.config.js"
+}
 }

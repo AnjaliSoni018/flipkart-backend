@@ -1,14 +1,22 @@
-import express, { Request, Response, NextFunction } from "express";
-import http from "http";
-import cors from "cors";
-import { json } from "body-parser";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import { json } from "body-parser";
+import cors from "cors";
+import express, { NextFunction, Request, Response } from "express";
+import http from "http";
+import db from "./models";
 
-import { typeDefs } from "./graphql/schema";
-import { resolvers } from "./graphql/schema";
 import { context } from "./context";
+import { resolvers, typeDefs } from "./graphql/schema";
+
+console.log("Sequelize initialized:", db.sequelize.getDatabaseName());
+
+db.sequelize
+  .authenticate()
+  .then(() => console.log("✅ Database connected"))
+  .catch((err) => console.error("❌ Database error", err));
+
 
 const startServer = async () => {
   const app = express();

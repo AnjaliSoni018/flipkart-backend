@@ -1,7 +1,6 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../config/config";
+import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
-interface UserAttributes {
+export interface UserAttributes {
   id: number;
   name?: string | null;
   phone: string;
@@ -20,7 +19,7 @@ type UserCreationAttributes = Optional<
   "id" | "name" | "email" | "password" | "gstin" | "isVerified" | "isApproved"
 >;
 
-class User
+export class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
@@ -38,57 +37,63 @@ class User
   public readonly updatedAt!: Date;
 }
 
-User.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
+// ✅ NEW: init function you call from index.ts
+export const initUserModel = (sequelize: Sequelize) => {
+  console.log("Initializing User model...");
+  User.init(
+    {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+        validate: { isEmail: true },
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      role: {
+        type: DataTypes.ENUM("CUSTOMER", "SELLER", "ADMIN"),
+        allowNull: false,
+        defaultValue: "CUSTOMER",
+      },
+      isVerified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      isApproved: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      gstin: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    phone: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-      validate: { isEmail: true },
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    role: {
-      type: DataTypes.ENUM("CUSTOMER", "SELLER", "ADMIN"),
-      allowNull: false,
-      defaultValue: "CUSTOMER",
-    },
-    isVerified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    isApproved: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    gstin: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  },
-  {
-    sequelize,
-    tableName: "users",
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: "User",
+      tableName: "users",
+      timestamps: true,
+    }
+  );
+  console.log("User model initialized.");[[]]
+};
 
-export default User;
+// export default User;
