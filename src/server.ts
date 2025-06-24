@@ -6,47 +6,50 @@ import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import http from "http";
 import db from "./models";
-
 import { context } from "./context";
 import { resolvers, typeDefs } from "./graphql/schema";
-
-console.log("Sequelize initialized:", db.sequelize.getDatabaseName());
-
-db.sequelize
-  .authenticate()
-  .then(() => console.log("✅ Database connected"))
-  .catch((err) => console.error("❌ Database error", err));
-
+import { initAdmin } from "./utils/initadmin";
 
 const startServer = async () => {
   const app = express();
   const httpServer = http.createServer(app);
 
-  app.use(cors());
-  app.use(json());
+  try {
+    console.log("Sequelize initialized:", db.sequelize.getDatabaseName());
 
-  const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers,
-  });
+    await db.sequelize.authenticate();
+    console.log("Database connected");
 
-  const server = new ApolloServer({ schema });
-  await server.start();
+    await initAdmin();
 
-  app.use(
-    "/graphql",
-    expressMiddleware(server, {
-      context: async (integrationContext) => {
-        const { req } = integrationContext;
-        return context({ req: req as unknown as import("express").Request });
-      },
-    }) as unknown as (req: Request, res: Response, next: NextFunction) => void
-  );
+    const schema = makeExecutableSchema({
+      typeDefs,
+      resolvers,
+    });
 
-  const PORT = process.env.PORT || 4000;
-  httpServer.listen(PORT, () => {
-    console.log(`Server ready at http://localhost:${PORT}/graphql`);
-  });
+    const server = new ApolloServer({ schema });
+    await server.start();
+
+    app.use(cors());
+    app.use(json());
+
+    app.use(
+      "/graphql",
+      expressMiddleware(server, {
+        context: async (integrationContext) => {
+          const { req } = integrationContext;
+          return context({ req: req as unknown as Request });
+        },
+      }) as unknown as (req: Request, res: Response, next: NextFunction) => void
+    );
+
+    const PORT = process.env.PORT || 4000;
+    httpServer.listen(PORT, () => {
+      console.log(`Server ready at http://localhost:${PORT}/graphql`);
+    });
+  } catch (error) {
+    console.error("Server startup error:", error);
+  }
 };
 
 startServer();

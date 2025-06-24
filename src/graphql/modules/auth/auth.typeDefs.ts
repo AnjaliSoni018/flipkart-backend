@@ -1,12 +1,19 @@
 import { gql } from "graphql-tag";
 
 export const authTypeDefs = gql`
-type Query {
+  type Query {
     _empty: String
   }
   type Mutation {
     authWithOTP(phone: String!): OTPResponse!
-    verifyOTP(phone: String!, otp: Int!): AuthPayload!
+    verifyOTP(phone: String!, otp: String!): AuthPayload!
+    adminLogin(email: String!, password: String!): AuthPayload!
+    sellerRegistration(
+      phone: String!
+      gstin: String!
+      name: String
+      email: String
+    ): OTPResponse!
   }
 
   type OTPResponse {

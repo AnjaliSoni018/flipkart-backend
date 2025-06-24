@@ -37,7 +37,6 @@ export class User
   public readonly updatedAt!: Date;
 }
 
-// ✅ NEW: init function you call from index.ts
 export const initUserModel = (sequelize: Sequelize) => {
   console.log("Initializing User model...");
   User.init(
@@ -93,7 +92,5 @@ export const initUserModel = (sequelize: Sequelize) => {
       timestamps: true,
     }
   );
-  console.log("User model initialized.");[[]]
+  console.log("User model initialized.");
 };
-
-// export default User;

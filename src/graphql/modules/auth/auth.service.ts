@@ -1,8 +1,10 @@
-// import  User from "../../../models/User";
 import jwt from "jsonwebtoken";
 import db from "../../../models";
-import { generateOTP, setOTP, validateOTP } from "./auth.utils";
+import { sendOTP, verifyOTP } from "../../../utils/sendOtp";
+import { comparePassword } from "../../../utils/hashPassword";
+
 const { User } = db;
+
 export const authService = {
   async authWithOTP(phone: string) {
     try {
@@ -17,10 +19,8 @@ export const authService = {
         });
       }
 
-      const otp = generateOTP();
-      setOTP(phone, otp);
-
-      console.log(`OTP sent to ${phone}: ${otp}`);
+      await sendOTP(phone);
+      console.log(`OTP sent to ${phone}`);
 
       return {
         success: true,
@@ -35,8 +35,8 @@ export const authService = {
     }
   },
 
-  async verifyOTP(phone: string, otp: number) {
-    const isValid = validateOTP(phone, otp);
+  async verifyOTP(phone: string, otp: string) {
+    const isValid = await verifyOTP(phone, otp.toString());
     if (!isValid) throw new Error("Invalid or expired OTP");
 
     const user = await User.findOne({ where: { phone } });
@@ -59,5 +59,57 @@ export const authService = {
       token,
       user,
     };
+  },
+
+  async adminLogin(email: string, password: string) {
+    const user = await User.findOne({ where: { email, role: "ADMIN" } });
+    if (!user) throw new Error("Admin not found");
+
+    if (!user.password) throw new Error("Password not set for the user");
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) throw new Error("Invalid credentials");
+
+    const token = jwt.sign(
+      { id: user.id, phone: user.phone, role: user.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    return { token, user };
+  },
+  async sellerRegistration(
+    phone: string,
+    gstin: string,
+    name?: string,
+    email?: string
+  ) {
+    let user = await User.findOne({ where: { phone } });
+
+    if (user) {
+      if (user.role === "SELLER")
+        throw new Error("Already registered as seller");
+      if (user.role === "CUSTOMER") {
+        user.gstin = gstin;
+        user.role = "SELLER";
+        user.isApproved = false;
+        if (name) user.name = name;
+        if (email) user.email = email;
+        await user.save();
+      }
+    } else {
+      user = await User.create({
+        phone,
+        gstin,
+        role: "SELLER",
+        isApproved: false,
+        isVerified: false,
+        name,
+        email,
+      });
+    }
+
+    await sendOTP(phone);
+
+    return { success: true, message: "OTP sent for seller verification" };
   },
 };
