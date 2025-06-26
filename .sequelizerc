@@ -1,8 +1,8 @@
 const path = require("path");
 
 module.exports = {
-  config: path.resolve("src/config", "sequelize.config.js"), // Path to config file
-  modelsPath: path.resolve("src/models"), // Path to models directory
-  seedersPath: path.resolve("src/seeders"), // Path to seeders directory
-  migrationsPath: path.resolve("src/migrations"), // Path to migrations directory
+  config: path.resolve("src/config", "sequelize.config.js"),
+  "models-path": path.resolve("src/models"),
+  "seeders-path": path.resolve("src/seeders"),
+  "migrations-path": path.resolve("src/migrations"),
 };

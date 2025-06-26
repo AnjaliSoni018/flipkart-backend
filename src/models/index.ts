@@ -1,17 +1,28 @@
 import { Sequelize } from "sequelize";
-import { sequelize } from "../config/db";
 import { initUserModel, User } from "./User";
+import { initProductModel, ProductInstance } from "./product";
+import { initProductImageModel, ProductImageInstance } from "./productImage";
+import { CategoryInstance, initCategoryModel } from "./category";
+import { sequelize } from "../config/db";
 
-console.log("Checking sequelize instance");
-console.log("Instanceof Sequelize?", sequelize instanceof Sequelize);
+interface DB {
+  sequelize: Sequelize;
+  User: typeof User;
+  Product: typeof ProductInstance;
+  ProductImage: typeof ProductImageInstance;
+  Category: typeof CategoryInstance;
+}
 
-console.log("Before initializing models...");
-console.log("Sequelize instance:", sequelize instanceof Object);
-initUserModel(sequelize);
-console.log("All models initialized.");
-console.log("Sequelize instance:", sequelize instanceof Object);
+const db = {} as DB;
 
-export default {
-  sequelize,
-  User,
-};
+db.sequelize = sequelize;
+db.User = initUserModel(sequelize);
+db.Product = initProductModel(sequelize);
+db.ProductImage = initProductImageModel(sequelize);
+db.Category = initCategoryModel(sequelize);
+
+db.Product.belongsTo(db.User, { foreignKey: "sellerId", as: "seller" });
+db.Product.belongsTo(db.Category, { foreignKey: "categoryId" });
+db.Product.hasMany(db.ProductImage, { foreignKey: "productId" });
+
+export default db;

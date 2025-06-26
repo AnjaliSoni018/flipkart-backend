@@ -92,5 +92,6 @@ export const initUserModel = (sequelize: Sequelize) => {
       timestamps: true,
     }
   );
+  return User;
   console.log("User model initialized.");
 };

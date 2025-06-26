@@ -23,14 +23,5 @@ export const authResolvers = {
     ) => {
       return await authService.adminLogin(email, password);
     },
-    sellerRegistration: async (
-      _: unknown,
-      {
-        phone,
-        gstin,
-        name,
-        email,
-      }: { phone: string; gstin: string; name?: string; email?: string }
-    ) => await authService.sellerRegistration(phone, gstin, name, email),
   },
 };

@@ -2,12 +2,22 @@ import { gql } from "graphql-tag";
 
 export const sellerTypeDefs = gql`
   extend type Mutation {
-    applyForSeller(gstin: String!): SellerApplicationResponse!
+    applyForSeller(
+      gstin: String!
+      email: String!
+      password: String!
+    ): SellerApplicationResponse!
+    sellerLogin(email: String!, password: String!): AuthPayload!
   }
 
   type SellerApplicationResponse {
     success: Boolean!
     message: String
+    user: User!
+  }
+
+  type AuthPayload {
+    token: String!
     user: User!
   }
 

@@ -25,5 +25,14 @@ export const adminResolvers = {
       roleGuard(context, ["ADMIN"]);
       return adminService.approveSeller(userId);
     },
+    createCategory: async (
+      _: unknown,
+      { name, parentId }: { name: string; parentId?: number },
+      context: GraphQLContext
+    ) => {
+      authGuard(context);
+      roleGuard(context, ["ADMIN"]);
+      return adminService.createCategory(name, parentId);
+    },
   },
 };

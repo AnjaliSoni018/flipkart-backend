@@ -1,5 +1,5 @@
 import db from "../../../models";
-const { User } = db;
+const { User, Category } = db;
 
 export const adminService = {
   async getPendingSellers() {
@@ -24,6 +24,20 @@ export const adminService = {
     return {
       success: true,
       message: `Seller with ID ${userId} approved.`,
+    };
+  },
+  async createCategory(name: string, parentId?: number) {
+    if (parentId) {
+      const parent = await Category.findByPk(parentId);
+      if (!parent) throw new Error("Parent category not found");
+    }
+
+    const category = await Category.create({ name, parentId });
+
+    return {
+      success: true,
+      message: "Category created successfully",
+      category,
     };
   },
 };

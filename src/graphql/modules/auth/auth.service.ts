@@ -77,39 +77,4 @@ export const authService = {
 
     return { token, user };
   },
-  async sellerRegistration(
-    phone: string,
-    gstin: string,
-    name?: string,
-    email?: string
-  ) {
-    let user = await User.findOne({ where: { phone } });
-
-    if (user) {
-      if (user.role === "SELLER")
-        throw new Error("Already registered as seller");
-      if (user.role === "CUSTOMER") {
-        user.gstin = gstin;
-        user.role = "SELLER";
-        user.isApproved = false;
-        if (name) user.name = name;
-        if (email) user.email = email;
-        await user.save();
-      }
-    } else {
-      user = await User.create({
-        phone,
-        gstin,
-        role: "SELLER",
-        isApproved: false,
-        isVerified: false,
-        name,
-        email,
-      });
-    }
-
-    await sendOTP(phone);
-
-    return { success: true, message: "OTP sent for seller verification" };
-  },
 };
