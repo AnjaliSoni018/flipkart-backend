@@ -40,4 +40,46 @@ export const adminService = {
       category,
     };
   },
+  async getAllCategories() {
+    const categories = await Category.findAll({
+      order: [["createdAt", "DESC"]],
+    });
+    return categories;
+  },
+  async updateCategory({
+    categoryId,
+    name,
+    parentId,
+  }: {
+    categoryId: number;
+    name?: string;
+    parentId?: number;
+  }) {
+    const category = await Category.findByPk(categoryId);
+    if (!category) throw new Error("Category not found");
+
+    if (name !== undefined) category.name = name;
+    if (parentId !== undefined) category.parentId = parentId;
+
+    await category.save();
+
+    return {
+      success: true,
+      message: "Category updated successfully",
+      category,
+    };
+  },
+
+  async deleteCategory(categoryId: number) {
+    const category = await Category.findByPk(categoryId);
+    if (!category) throw new Error("Category not found");
+
+    await category.destroy();
+
+    return {
+      success: true,
+      message: "Category deleted successfully",
+      category: null,
+    };
+  },
 };

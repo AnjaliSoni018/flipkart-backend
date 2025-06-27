@@ -12,6 +12,7 @@ export const productTypeDefs = gql`
     isActive: Boolean!
     createdAt: String
     updatedAt: String
+    images: [ProductImage!]!
   }
 
   type ProductImage {
@@ -33,6 +34,31 @@ export const productTypeDefs = gql`
     success: Boolean!
     message: String
     image: ProductImage
+  }
+
+  type MyProductsResponse {
+    success: Boolean!
+    message: String
+    products: [Product!]!
+    total: Int!
+  }
+
+  type PublicProductsResponse {
+    success: Boolean!
+    message: String
+    products: [Product!]!
+    total: Int!
+  }
+
+  type ProductDetailResponse {
+    success: Boolean!
+    message: String
+    product: Product
+  }
+
+  type DeleteProductResponse {
+    success: Boolean!
+    message: String
   }
 
   extend type Mutation {
@@ -68,5 +94,16 @@ export const productTypeDefs = gql`
     ): ProductImageResponse!
 
     deleteProductImage(imageId: Int!): ProductImageResponse!
+    deleteProduct(productId: Int!): DeleteProductResponse!
+  }
+
+  extend type Query {
+    myProducts(limit: Int, offset: Int): MyProductsResponse!
+    getProducts(
+      limit: Int
+      offset: Int
+      categoryId: Int
+    ): PublicProductsResponse!
+    getProductById(productId: Int!): ProductDetailResponse!
   }
 `;

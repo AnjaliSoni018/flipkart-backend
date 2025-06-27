@@ -22,7 +22,8 @@ db.ProductImage = initProductImageModel(sequelize);
 db.Category = initCategoryModel(sequelize);
 
 db.Product.belongsTo(db.User, { foreignKey: "sellerId", as: "seller" });
-db.Product.belongsTo(db.Category, { foreignKey: "categoryId" });
-db.Product.hasMany(db.ProductImage, { foreignKey: "productId" });
+db.Product.belongsTo(db.Category, { foreignKey: "categoryId", as: "category" });
+db.Product.hasMany(db.ProductImage, { foreignKey: "productId", as: "images" });
+db.ProductImage.belongsTo(db.Product, { foreignKey: "productId" });
 
 export default db;

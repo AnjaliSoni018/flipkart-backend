@@ -1,5 +1,7 @@
 import db from "../../../models";
 import { uploadImage } from "../../../utils/claudinary";
+import { WhereOptions } from "sequelize/types";
+
 const { Product, Category, ProductImage } = db;
 
 export const productService = {
@@ -194,6 +196,100 @@ export const productService = {
       success: true,
       message: "Product image deleted successfully",
       image: null,
+    };
+  },
+  async myProducts({
+    sellerId,
+    limit = 10,
+    offset = 0,
+  }: {
+    sellerId: number;
+    limit?: number;
+    offset?: number;
+  }) {
+    const products = await Product.findAll({
+      where: { sellerId },
+      include: [
+        {
+          model: ProductImage,
+          as: "images",
+          required: false,
+        },
+      ],
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+    });
+
+    return products;
+  },
+  async getProducts({
+    limit = 10,
+    offset = 0,
+    categoryId,
+  }: {
+    limit?: number;
+    offset?: number;
+    categoryId?: number;
+  }) {
+    const where: WhereOptions = { isActive: true };
+
+    if (categoryId !== undefined) {
+      where["categoryId"] = categoryId;
+    }
+
+    const { count, rows: products } = await db.Product.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: db.ProductImage,
+          as: "images",
+        },
+      ],
+    });
+
+    return {
+      total: count,
+      products,
+    };
+  },
+  async getProductById(productId: number) {
+    const product = await db.Product.findOne({
+      where: { id: productId, isActive: true },
+      include: [
+        {
+          model: db.ProductImage,
+          as: "images",
+        },
+      ],
+    });
+
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    return product;
+  },
+  async deleteProduct(productId: number, sellerId: number) {
+    const product = await db.Product.findOne({
+      where: { id: productId, sellerId },
+    });
+
+    if (!product) {
+      return {
+        success: false,
+        message: "Product not found or you do not have permission to delete",
+      };
+    }
+    await ProductImage.destroy({ where: { productId } });
+    await Product.destroy({ where: { id: productId } });
+
+    return {
+      success: true,
+      message: "Product deleted successfully",
     };
   },
 };

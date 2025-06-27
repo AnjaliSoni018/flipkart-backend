@@ -14,6 +14,9 @@ export const adminResolvers = {
       roleGuard(context, ["ADMIN"]);
       return adminService.getPendingSellers();
     },
+    getAllCategories: async () => {
+      return adminService.getAllCategories();
+    },
   },
   Mutation: {
     approveSeller: async (
@@ -33,6 +36,27 @@ export const adminResolvers = {
       authGuard(context);
       roleGuard(context, ["ADMIN"]);
       return adminService.createCategory(name, parentId);
+    },
+    updateCategory: async (
+      _: unknown,
+      args: { categoryId: number; name?: string; parentId?: number },
+      context: GraphQLContext
+    ) => {
+      authGuard(context);
+      roleGuard(context, ["ADMIN"]);
+
+      return adminService.updateCategory(args);
+    },
+
+    deleteCategory: async (
+      _: unknown,
+      args: { categoryId: number },
+      context: GraphQLContext
+    ) => {
+      authGuard(context);
+      roleGuard(context, ["ADMIN"]);
+
+      return adminService.deleteCategory(args.categoryId);
     },
   },
 };
