@@ -6,6 +6,7 @@ interface ProductImageAttributes {
   url: string;
   altText?: string;
   isPrimary: boolean;
+  publicId: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -24,6 +25,7 @@ export class ProductImageInstance
   public url!: string;
   public altText?: string;
   public isPrimary!: boolean;
+  public publicId!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -36,6 +38,7 @@ export const initProductImageModel = (sequelize: Sequelize) => {
       url: { type: DataTypes.STRING, allowNull: false },
       altText: { type: DataTypes.STRING },
       isPrimary: { type: DataTypes.BOOLEAN, defaultValue: false },
+      publicId: { type: DataTypes.STRING, allowNull: false },
     },
     {
       sequelize,

@@ -1,41 +1,34 @@
 "use strict";
 
 export async function up(queryInterface, Sequelize) {
-  await queryInterface.createTable("products", {
+  await queryInterface.createTable("cart_items", {
     id: {
       type: Sequelize.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
     },
-    seller_id: {
+    user_id: {
       type: Sequelize.INTEGER.UNSIGNED,
       allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+      onDelete: "CASCADE",
     },
-    category_id: {
+    product_id: {
       type: Sequelize.INTEGER.UNSIGNED,
       allowNull: false,
+      references: {
+        model: "products",
+        key: "id",
+      },
+      onDelete: "CASCADE",
     },
-    name: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: Sequelize.TEXT,
-      allowNull: true,
-    },
-    price: {
-      type: Sequelize.DECIMAL(10, 2),
-      allowNull: false,
-    },
-    stock_qty: {
+    quantity: {
       type: Sequelize.INTEGER.UNSIGNED,
       allowNull: false,
-      defaultValue: 0,
-    },
-    is_active: {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
+      defaultValue: 1,
     },
     created_at: {
       type: Sequelize.DATE,
@@ -50,5 +43,5 @@ export async function up(queryInterface, Sequelize) {
   });
 }
 export async function down(queryInterface) {
-  await queryInterface.dropTable("products");
+  await queryInterface.dropTable("cart_items");
 }

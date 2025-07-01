@@ -1,41 +1,53 @@
 "use strict";
 
 export async function up(queryInterface, Sequelize) {
-  await queryInterface.createTable("products", {
+  await queryInterface.createTable("addresses", {
     id: {
-      type: Sequelize.INTEGER.UNSIGNED,
+      type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    seller_id: {
+    user_id: {
       type: Sequelize.INTEGER.UNSIGNED,
       allowNull: false,
+      references: { model: "users", key: "id" },
+      onDelete: "CASCADE",
     },
-    category_id: {
-      type: Sequelize.INTEGER.UNSIGNED,
-      allowNull: false,
-    },
-    name: {
+    full_name: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    description: {
-      type: Sequelize.TEXT,
-      allowNull: true,
-    },
-    price: {
-      type: Sequelize.DECIMAL(10, 2),
+    phone: {
+      type: Sequelize.STRING,
       allowNull: false,
     },
-    stock_qty: {
-      type: Sequelize.INTEGER.UNSIGNED,
+    address_line1: {
+      type: Sequelize.STRING,
       allowNull: false,
-      defaultValue: 0,
     },
-    is_active: {
+    address_line2: {
+      type: Sequelize.STRING,
+    },
+    city: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    state: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    postal_code: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    country: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    is_default: {
       type: Sequelize.BOOLEAN,
       allowNull: false,
-      defaultValue: true,
+      defaultValue: false,
     },
     created_at: {
       type: Sequelize.DATE,
@@ -50,5 +62,5 @@ export async function up(queryInterface, Sequelize) {
   });
 }
 export async function down(queryInterface) {
-  await queryInterface.dropTable("products");
+  await queryInterface.dropTable("addresses");
 }
