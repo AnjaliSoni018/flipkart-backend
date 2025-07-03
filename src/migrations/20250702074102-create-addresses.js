@@ -3,7 +3,7 @@
 export async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("addresses", {
     id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
     },

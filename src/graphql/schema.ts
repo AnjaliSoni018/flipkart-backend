@@ -11,6 +11,8 @@ import { productTypeDefs } from "./modules/products/product.typeDefs";
 import { productResolvers } from "./modules/products/product.resolvers";
 import { customerTypeDefs } from "./modules/customer/customer.typedefs";
 import { customerResolvers } from "./modules/customer/customer.resolver";
+import { orderTypeDefs } from "./modules/order/order.typedefs";
+import { orderResolvers } from "./modules/order/order.resolver";
 
 export const typeDefs = [
   authTypeDefs,
@@ -18,6 +20,7 @@ export const typeDefs = [
   adminTypeDefs,
   productTypeDefs,
   customerTypeDefs,
+  orderTypeDefs,
 ];
 export const resolvers = [
   authResolvers,
@@ -25,4 +28,5 @@ export const resolvers = [
   adminResolvers,
   productResolvers,
   customerResolvers,
+  orderResolvers,
 ];
