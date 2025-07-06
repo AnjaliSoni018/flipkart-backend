@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import db from "../../../models";
 import { sendOTP, verifyOTP } from "../../../utils/sendOtp";
-import { comparePassword } from "../../../utils/hashPassword";
+import { comparePassword, hashPassword } from "../../../utils/hashPassword";
 
 const { User } = db;
 
@@ -76,5 +76,31 @@ export const authService = {
     );
 
     return { token, user };
+  },
+  async changePassword({
+    userId,
+    oldPassword,
+    newPassword,
+  }: {
+    userId: string;
+    oldPassword: string;
+    newPassword: string;
+  }) {
+    const user = await User.findByPk(userId);
+    if (!user) throw new Error("User not found");
+
+    if (!user.password) {
+  throw new Error('User password not set');
+}
+    const isValid = await comparePassword(oldPassword, user.password);
+    if (!isValid) throw new Error("Incorrect current password");
+
+    user.password = await hashPassword(newPassword);
+    await user.save();
+
+    return {
+      success: true,
+      message: "Password changed successfully",
+    };
   },
 };

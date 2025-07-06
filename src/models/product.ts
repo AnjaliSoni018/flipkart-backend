@@ -9,13 +9,14 @@ interface ProductAttributes {
   price: number;
   stockQty: number;
   isActive: boolean;
+  status: 'pending' | 'approved' | 'rejected'; 
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 type ProductCreationAttributes = Optional<
   ProductAttributes,
-  "id" | "description" | "stockQty" | "isActive" | "createdAt" | "updatedAt"
+  "id" | "description" | "stockQty" | "isActive" | "status" | "createdAt" | "updatedAt"
 >;
 
 export class ProductInstance
@@ -30,6 +31,7 @@ export class ProductInstance
   public price!: number;
   public stockQty!: number;
   public isActive!: boolean;
+  public status!: 'pending' | 'approved' | 'rejected';  
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -45,6 +47,11 @@ export const initProductModel = (sequelize: Sequelize) => {
       price: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
       stockQty: { type: DataTypes.INTEGER, defaultValue: 0 },
       isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
+      status: { 
+        type: DataTypes.ENUM('pending', 'approved', 'rejected'),
+        allowNull: false,
+        defaultValue: 'pending',
+      },
     },
     {
       sequelize,

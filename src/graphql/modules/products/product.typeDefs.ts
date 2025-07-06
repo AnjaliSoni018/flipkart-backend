@@ -1,6 +1,11 @@
 import { gql } from "graphql-tag";
 
 export const productTypeDefs = gql`
+  enum ProductStatus {
+    pending
+    approved
+    rejected
+  }
   type Product {
     id: ID!
     sellerId: ID!
@@ -9,6 +14,7 @@ export const productTypeDefs = gql`
     description: String
     price: Float!
     stockQty: Int!
+    status: ProductStatus!
     isActive: Boolean!
     createdAt: String
     updatedAt: String

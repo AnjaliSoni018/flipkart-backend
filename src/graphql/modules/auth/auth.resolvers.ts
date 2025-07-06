@@ -1,3 +1,5 @@
+import { authGuard } from "../../../middlewares/auth.guard";
+import { GraphQLContext } from "../../../types/context";
 import { authService } from "./auth.service";
 
 export const authResolvers = {
@@ -22,6 +24,18 @@ export const authResolvers = {
       { email, password }: { email: string; password: string }
     ) => {
       return await authService.adminLogin(email, password);
+    },
+     changePassword: async (
+      _: unknown,
+      args: { oldPassword: string; newPassword: string },
+      context: GraphQLContext
+    ) => {
+      const user = authGuard(context); 
+      return authService.changePassword({
+        userId: user.id,
+        oldPassword: args.oldPassword,
+        newPassword: args.newPassword,
+      });
     },
   },
 };

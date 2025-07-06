@@ -30,9 +30,11 @@ export const productService = {
       description,
       price,
       stockQty,
+      status: "pending",  
+      isActive: false, 
     });
 
-    return { success: true, message: "Product created successfully", product };
+    return { success: true, message: "Product created and pending approval", product };
   },
 
   async addProductImage({

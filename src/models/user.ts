@@ -9,6 +9,7 @@ export interface UserAttributes {
   role: "CUSTOMER" | "SELLER" | "ADMIN";
   isVerified: boolean;
   isApproved: boolean;
+  isActive: boolean;
   gstin?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -16,7 +17,7 @@ export interface UserAttributes {
 
 type UserCreationAttributes = Optional<
   UserAttributes,
-  "id" | "name" | "email" | "password" | "gstin" | "isVerified" | "isApproved"
+  "id" | "name" | "email" | "password" | "gstin" | "isVerified" | "isApproved"|"isActive"
 >;
 
 export class User
@@ -31,6 +32,7 @@ export class User
   public role!: "CUSTOMER" | "SELLER" | "ADMIN";
   public isVerified!: boolean;
   public isApproved!: boolean;
+  public isActive!: boolean;
   public gstin!: string | null;
 
   public readonly createdAt!: Date;
@@ -79,6 +81,11 @@ export const initUserModel = (sequelize: Sequelize) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+      },
+       isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
       },
       gstin: {
         type: DataTypes.STRING,

@@ -8,6 +8,7 @@ export const authTypeDefs = gql`
     authWithOTP(phone: String!): OTPResponse!
     verifyOTP(phone: String!, otp: String!): AuthPayload!
     adminLogin(email: String!, password: String!): AuthPayload!
+    changePassword(oldPassword: String!, newPassword: String!): OTPResponse!
   }
 
   type OTPResponse {
