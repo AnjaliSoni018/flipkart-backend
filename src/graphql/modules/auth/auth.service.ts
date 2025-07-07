@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import db from "../../../models";
 import { sendOTP, verifyOTP } from "../../../utils/sendOtp";
 import { comparePassword, hashPassword } from "../../../utils/hashPassword";
+import { Op } from "sequelize";
 
 const { User } = db;
 
@@ -103,4 +104,71 @@ export const authService = {
       message: "Password changed successfully",
     };
   },
+  async searchProductsAsAdmin({
+  search,
+  status,
+  isActive,
+  categoryId,
+  sellerId,
+  limit,
+  offset,
+}: {
+  search?: string;
+  status?: string;
+  isActive?: boolean;
+  categoryId?: number;
+  sellerId?: number;
+  limit: number;
+  offset: number;
+}) {
+  const whereClause: any = {};
+
+  if (search) {
+    whereClause[Op.or] = [
+      { name: { [Op.like]: `%${search}%` } },
+      { description: { [Op.like]: `%${search}%` } },
+    ];
+  }
+
+  if (status) {
+    whereClause.status = status.toUpperCase();
+  }
+
+  if (isActive !== undefined) {
+    whereClause.isActive = isActive;
+  }
+
+  if (categoryId) {
+    whereClause.categoryId = categoryId;
+  }
+
+  if (sellerId) {
+    whereClause.sellerId = sellerId;
+  }
+
+  const { count, rows } = await db.Product.findAndCountAll({
+    where: whereClause,
+    limit,
+    offset,
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: db.ProductImage,
+        as: "images",
+      },
+      {
+        model: db.User,
+        as: "seller",
+        attributes: ["id", "name", "email"],
+      },
+    ],
+  });
+
+  return {
+    success: true,
+    message: "Products searched and filtered successfully",
+    products: rows,
+    total: count,
+  };
+}
 };

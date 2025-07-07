@@ -35,7 +35,6 @@ export const productTypeDefs = gql`
     message: String
     product: Product
   }
-
   type ProductImageResponse {
     success: Boolean!
     message: String
@@ -111,5 +110,11 @@ export const productTypeDefs = gql`
       categoryId: Int
     ): PublicProductsResponse!
     getProductById(productId: Int!): ProductDetailResponse!
+     searchProducts(
+    search: String
+    categoryId: Int
+    limit: Int
+    offset: Int
+  ): PublicProductsResponse!
   }
 `;

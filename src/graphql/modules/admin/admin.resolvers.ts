@@ -75,6 +75,62 @@ adminGetAllProducts: async (
 
   return adminService.getAllProductsAsAdmin(limit, offset, status, categoryId);
 },
+adminSearchProducts: async (
+  _: unknown,
+  args: {
+    search?: string;
+    status?: string;
+    isActive?: boolean;
+    categoryId?: number;
+    sellerId?: number;
+    limit?: number;
+    offset?: number;
+  },
+  context: GraphQLContext
+) => {
+  authGuard(context);
+  roleGuard(context, ["ADMIN"]);
+
+  const {
+    search,
+    status,
+    isActive,
+    categoryId,
+    sellerId,
+    limit = 10,
+    offset = 0,
+  } = args;
+
+  return adminService.searchProductsAsAdmin({
+    search,
+    status,
+    isActive,
+    categoryId,
+    sellerId,
+    limit,
+    offset,
+  });
+},
+viewAllOrders: async (
+  _: unknown,
+  { limit = 10, offset = 0, status }: { limit?: number; offset?: number, status?:string },
+  context: GraphQLContext
+) => {
+  authGuard(context);
+  roleGuard(context, ["ADMIN"]);
+
+  return adminService.getAllOrders(limit, offset);
+},
+viewOrderDetails: async (
+  _: unknown,
+  { orderId }: { orderId: string },
+  context: GraphQLContext
+) => {
+  authGuard(context);
+  roleGuard(context, ["ADMIN"]);
+
+  return adminService.getOrderDetails(orderId);
+},
   },
 
   Mutation: {
@@ -182,6 +238,25 @@ unblockUser: async (
   authGuard(context);
   roleGuard(context, ["ADMIN"]);
   return adminService.toggleUserActiveStatus(userId, true);
+},
+activateProduct: async (
+  _: unknown,
+  { productId }: { productId: string },
+  context: GraphQLContext
+) => {
+  authGuard(context);
+  roleGuard(context, ["ADMIN"]);
+  return adminService.toggleProductActiveStatus(Number(productId), true);
+},
+
+deactivateProduct: async (
+  _: unknown,
+  { productId }: { productId: string },
+  context: GraphQLContext
+) => {
+  authGuard(context);
+  roleGuard(context, ["ADMIN"]);
+  return adminService.toggleProductActiveStatus(Number(productId), false);
 },
   },
 };

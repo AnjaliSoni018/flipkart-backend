@@ -294,6 +294,154 @@ async getAllProductsAsAdmin(
     products: rows,
     total: count,
   };
-}
+},
+async toggleProductActiveStatus(productId: number, makeActive: boolean) {
+  const product = await Product.findByPk(productId);
 
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  if (product.status !== "approved") {
+    throw new Error("Only approved products can be activated or deactivated.");
+  }
+
+  product.isActive = makeActive;
+  await product.save();
+
+  return {
+    success: true,
+    message: `Product has been ${makeActive ? "activated" : "deactivated"} successfully.`,
+  };
+},
+async searchProductsAsAdmin({
+  search,
+  status,
+  isActive,
+  categoryId,
+  sellerId,
+  limit,
+  offset,
+}: {
+  search?: string;
+  status?: string;
+  isActive?: boolean;
+  categoryId?: number;
+  sellerId?: number;
+  limit: number;
+  offset: number;
+}) {
+  const whereClause: any = {};
+
+  if (search) {
+    whereClause[Op.or] = [
+      { name: { [Op.like]: `%${search}%` } },
+      { description: { [Op.like]: `%${search}%` } },
+    ];
+  }
+
+  if (status) {
+    whereClause.status = status.toUpperCase();
+  }
+
+  if (isActive !== undefined) {
+    whereClause.isActive = isActive;
+  }
+
+  if (categoryId) {
+    whereClause.categoryId = categoryId;
+  }
+
+  if (sellerId) {
+    whereClause.sellerId = sellerId;
+  }
+
+  const { count, rows } = await db.Product.findAndCountAll({
+    where: whereClause,
+    limit,
+    offset,
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: db.ProductImage,
+        as: "images",
+      },
+      {
+        model: db.User,
+        as: "seller",
+        attributes: ["id", "name", "email"],
+      },
+    ],
+  });
+
+  return {
+    success: true,
+    message: "Products searched and filtered successfully",
+    products: rows,
+    total: count,
+  };
+},
+async getAllOrders(limit = 10, offset = 0, status?: string) {
+  const whereClause: any = {};
+
+  if (status) {
+    whereClause.status = status;
+  }
+
+  const { count, rows } = await db.Order.findAndCountAll({
+    where: whereClause,
+    limit,
+    offset,
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: db.User,
+        as: "buyer",
+        attributes: ["id", "name", "email"],
+      },
+      {
+        model: db.OrderItem,
+        as: "orderItems",
+        attributes: ["id", "productId", "productName", "quantity", "price"],
+      },
+    ],
+  });
+
+  return {
+    success: true,
+    message: "Orders fetched successfully",
+    orders: rows,
+    total: count,
+  };
+},
+async getOrderDetails(orderId: string) {
+  const order = await db.Order.findByPk(orderId, {
+    include: [
+      {
+        model: db.User,
+        as: "buyer",
+        attributes: ["id", "name", "email"],
+      },
+      {
+        model: db.OrderItem,
+        as: "orderItems",
+        attributes: ["id", "productId", "productName", "quantity", "price"],
+      },
+    ],
+  });
+
+  if (!order) {
+    return {
+      success: false,
+      message: "Order not found",
+      order: null,
+    };
+  }
+
+  return {
+    success: true,
+    message: "Order details fetched successfully",
+    order,
+  };
+}
 };

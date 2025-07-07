@@ -1,6 +1,6 @@
 import db from "../../../models";
 import { uploadImage, deleteImage } from "../../../utils/claudinary";
-import { WhereOptions } from "sequelize/types";
+import { Op, WhereOptions } from "sequelize/types";
 
 const { Product, Category, ProductImage } = db;
 
@@ -269,4 +269,56 @@ export const productService = {
 
     return { success: true, message: "Product deleted successfully" };
   },
+  async searchPublicProducts({
+  search,
+  categoryId,
+  limit,
+  offset,
+}: {
+  search?: string;
+  categoryId?: number;
+  limit: number;
+  offset: number;
+}) {
+  const where: any = {
+    status: "APPROVED",
+    isActive: true,
+  };
+
+  if (search) {
+    where[Op.or] = [
+      { name: { [Op.like]: `%${search}%` } },
+      { description: { [Op.like]: `%${search}%` } },
+    ];
+  }
+
+  if (categoryId) {
+    where.categoryId = categoryId;
+  }
+
+  const { count, rows } = await db.Product.findAndCountAll({
+    where,
+    limit,
+    offset,
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: db.ProductImage,
+        as: "images",
+      },
+      {
+        model: db.User,
+        as: "seller",
+        attributes: ["id", "name"],
+      },
+    ],
+  });
+
+  return {
+    success: true,
+    message: "Products fetched successfully",
+    products: rows,
+    total: count,
+  };
+}
 };

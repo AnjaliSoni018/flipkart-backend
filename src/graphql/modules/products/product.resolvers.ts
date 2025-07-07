@@ -170,5 +170,21 @@ export const productResolvers = {
         product,
       };
     },
+    searchProducts: async (
+  _: unknown,
+  {
+    search,
+    categoryId,
+    limit = 10,
+    offset = 0,
+  }: {
+    search?: string;
+    categoryId?: number;
+    limit?: number;
+    offset?: number;
+  }
+) => {
+  return productService.searchPublicProducts({ search, categoryId, limit, offset });
+},
   },
 };
